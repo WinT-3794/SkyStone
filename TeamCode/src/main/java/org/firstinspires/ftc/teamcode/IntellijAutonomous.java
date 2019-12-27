@@ -40,7 +40,7 @@ import org.firstinspires.ftc.teamcode.helpers.LibTMOA;
 import org.firstinspires.ftc.teamcode.helpers.SQLiteHelper;
 import org.firstinspires.ftc.teamcode.helpers.Utilities;
 
-@Autonomous(name = "Red Alliance", group = "Joker")
+@Autonomous(name = "Intellij Autonomous", group = "Joker")
 public class IntellijAutonomous extends LinearOpMode {
   private ElapsedTime runtime = new ElapsedTime();
 
