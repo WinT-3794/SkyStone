@@ -11,80 +11,32 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.SwitchableLight;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.vuforia.CameraDevice;
-import com.vuforia.HINT;
-import com.vuforia.Image;
-import com.vuforia.PIXEL_FORMAT;
-import com.vuforia.Vuforia;
-import java.lang.annotation.Target;
-import java.lang.Thread;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
-import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.Func;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.helpers.LibTMOA;
 
 @Autonomous(name = "Red Alliance", group = "Joker")
-public class IntellijRed extends LinearOpMode {
+public class IntellijRedA extends LinearOpMode {
   private ElapsedTime runtime = new ElapsedTime();
   private static final double stoneLength = 8.4;
 
@@ -159,20 +111,12 @@ public class IntellijRed extends LinearOpMode {
   public VuforiaTrackables targetsSkyStone;
   private AndroidTextToSpeech speech;
 
-  private double distance = 0;
-  private boolean initMoving = true;
   public NormalizedRGBA colors;
   public NormalizedRGBA colorsV;
-  public float allianceColor = 0;
   public float red = 0;
   public float redV = 0;
-  private int change = 0;
-  public double allianceMultiplicator = 0;
-  double jsX = 0;
-  double jsRY = 0;
   private int stage = 0;
   private int nextSkyStone = -1;
-  public byte allianceVelocity = 0;
 
   @Override
   public void runOpMode() {
@@ -506,16 +450,6 @@ public class IntellijRed extends LinearOpMode {
     }
   }
 
-  private void climbElevator(double speed) {
-    ELE_P.setPower(speed);
-    ELE_A1.setPower(speed);
-    ELE_A2.setPower(speed);
-  }
-
-  private void climbArm(double speed) {
-    BRZ.setPower(speed);
-  }
-
   public void moveToPosition(double inches, double speed) {
     int move = (int) (Math.round(inches * conversion));
 
@@ -549,19 +483,6 @@ public class IntellijRed extends LinearOpMode {
     SP_IZQ.setPower(0);
     IN_DRC.setPower(0);
     IN_IZQ.setPower(0);
-    return;
-  }
-
-  public void turnWithEncoder(double input) {
-    SP_IZQ.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    IN_IZQ.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    SP_DRC.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    IN_DRC.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-    SP_IZQ.setPower(input);
-    IN_IZQ.setPower(input);
-    SP_DRC.setPower(-input);
-    IN_DRC.setPower(-input);
   }
 
   public void claw(double orient) {
@@ -579,7 +500,6 @@ public class IntellijRed extends LinearOpMode {
     sleep(700);
     mecanum.move(-1, 0, 0);
     sleep(130);
-    return;
   }
 
   public void claw2(double orient) {
@@ -596,7 +516,6 @@ public class IntellijRed extends LinearOpMode {
     mecanum.stop();
     CUBO.setPosition(1);
     sleep(700);
-    return;
   }
 
   public String vuforiaRead() {
@@ -627,19 +546,6 @@ public class IntellijRed extends LinearOpMode {
     IN_IZQ.setPower(mecanum.calc1(speed, 0, 0));
     SP_DRC.setPower(mecanum.calc1(speed, 0, 0));
     IN_DRC.setPower(mecanum.calc2(speed, 0, 0));
-
-    /*while (
-      SP_IZQ.isBusy() && SP_DRC.isBusy() && IN_IZQ.isBusy() && IN_DRC.isBusy()
-    ) {
-      if (exit) {
-        SP_DRC.setPower(0);
-        SP_IZQ.setPower(0);
-        IN_DRC.setPower(0);
-        IN_IZQ.setPower(0);
-        return;
-      }
-    }*/
-    return;
   }
 
   public void turnToPosition(double inches, double speed) {

@@ -7,18 +7,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.helpers.LibTMOA;
 
 @TeleOp(name = "TeleOp", group = "Joker")
 public class TeleOp2020 extends LinearOpMode {
@@ -26,8 +20,8 @@ public class TeleOp2020 extends LinearOpMode {
   Integer cpr = 28; //counts per rotation
   Integer gearratio = 20;
   Double diameter = 2.952755906;
-  Double cpi = (cpr * gearratio) / (Math.PI * diameter); //counts per inch, 28cpr * gear ratio / (2 * pi * diameter (in inches, in the center))
-  Double bias = 0.91; //default 0.8
+  Double cpi = (cpr * gearratio) / (Math.PI * diameter);
+  Double bias = 0.91;
   Double meccyBias = 0.9;
   Double conversion = cpi * bias;
   Boolean exit = false;
