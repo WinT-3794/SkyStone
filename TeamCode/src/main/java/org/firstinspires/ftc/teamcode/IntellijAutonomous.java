@@ -49,15 +49,6 @@ public class IntellijAutonomous extends LinearOpMode {
   public TouchSensor digitalTouch2;
   public TouchSensor foundation;
 
-  Double width = 16.16;
-  Integer cpr = 28;
-  Integer gearratio = 20;
-  Double diameter = 2.952755906;
-  Double cpi = (cpr * gearratio) / (Math.PI * diameter);
-  Double bias = 0.91;
-  Double meccyBias = 0.9;
-  Double conversion = cpi * bias;
-
   private boolean isCalcCorrect = true;
   private boolean isRedAlliance = true;
   private double nextSkyStoneInches = 0;
@@ -93,6 +84,8 @@ public class IntellijAutonomous extends LinearOpMode {
   public NormalizedRGBA colorsV;
   public float red = 0;
   public float redV = 0;
+  public float blue = 0;
+  public float blueV = 0;
   private int stage = 0;
   private int nextSkyStone = -1;
 
@@ -146,10 +139,10 @@ public class IntellijAutonomous extends LinearOpMode {
         IN_IZQ,
         SP_DRC,
         IN_DRC,
-        width,
-        cpr,
-        gearratio,
-        diameter
+        Utilities.WIDTH,
+        Utilities.CPR,
+        Utilities.GEAR_RATIO,
+        Utilities.DIAMETER
       );
 
     int cameraMonitorViewId = hardwareMap
@@ -305,6 +298,8 @@ public class IntellijAutonomous extends LinearOpMode {
             mecanum.withoutEncoders();
             mecanum.stop();
             BRZ.setPower(0);
+            red = colors.red;
+            redV = colorsV.red;
             while (red < Utilities.RED_COLOR || redV < Utilities.RED_VERIFIER_COLOR) {
               mecanum.move(0, 0, 1);
               colors = colorSensor.getNormalizedColors();
@@ -489,7 +484,7 @@ public class IntellijAutonomous extends LinearOpMode {
               break;
             }
             while (nextSkyStone < 4 && !vuforiaRead().equals("Stone Target")) {
-              mecanumToPosition(Utilities.STONE_LENGHT, 0.8);
+              mecanumToPosition(-Utilities.STONE_LENGHT, 0.8);
               sleep(400);
               mecanum.stop();
               nextSkyStone++;
@@ -503,27 +498,22 @@ public class IntellijAutonomous extends LinearOpMode {
           case 2:
             mecanum.move(.8, Math.PI, 0);
             sleep(100);
-            mecanum.stop();/*
-          if(nextSkyStone == 1){
-            claw(0);
-          }else{
-            claw(1);
-          }*/
-            claw(1);
+            mecanum.stop();
+            claw(3);
             BRZ.setPower(-1);
-            turnToPosition(16.2, 1);
+            turnToPosition(-16.2, 1);
             sleep(400);
             break;
           case 3:
             mecanum.withoutEncoders();
             mecanum.stop();
             BRZ.setPower(0);
-            while (red < Utilities.BLUE_COLOR || redV < Utilities.BLUE_VERIFIER_COLOR) {
+            while (blue < Utilities.BLUE_COLOR || blueV < Utilities.BLUE_VERIFIER_COLOR) {
               mecanum.move(0, 0, 1);
               colors = colorSensor.getNormalizedColors();
               colorsV = colorSensorVerifier.getNormalizedColors();
-              red = colors.red;
-              redV = colorsV.red;
+              blue = colors.blue;
+              blueV = colorsV.blue;
             }
             mecanum.stop();
             sleep(20);
@@ -531,7 +521,7 @@ public class IntellijAutonomous extends LinearOpMode {
           case 4:
             mecanum.targetToPositionEncoders();
             moveToPosition(34, 1);
-            turnToPosition(18, 1);
+            turnToPosition(-18, 1);
             mecanum.stop();
             sleep(50);
             mecanum.withoutEncoders();
@@ -545,10 +535,10 @@ public class IntellijAutonomous extends LinearOpMode {
             JL_DRC.setPosition(1);
             JL_IZQ.setPosition(0);
             sleep(350);
-            mecanum.moveWithoutLimits(7 * Math.PI / 4);
+            mecanum.moveWithoutLimits(Math.PI / 4);
             sleep(1300);
             mecanum.stop();
-            turnToPosition(20, 1);
+            turnToPosition(-20, 1);
             sleep(100);
             mecanum.withoutEncoders();
             mecanum.stop();
@@ -557,7 +547,7 @@ public class IntellijAutonomous extends LinearOpMode {
           case 6:
             JL_DRC.setPosition(0);
             JL_IZQ.setPosition(1);
-            mecanum.move(1, 3 * Math.PI / 2, 0);
+            mecanum.move(1, Math.PI / 2, 0);
             CUBO.setPosition(0);
             BRZ.setPower(0.45);
             sleep(70);
@@ -573,7 +563,7 @@ public class IntellijAutonomous extends LinearOpMode {
             CUBO.setPosition(1);
             sleep(2050);
             mecanum.stop();
-            turnToPosition(20.4, 1);
+            turnToPosition(-20.4, 1);
             sleep(50);
             mecanum.withoutEncoders();
             mecanum.stop();
@@ -593,7 +583,7 @@ public class IntellijAutonomous extends LinearOpMode {
             sleep(20);
             break;
           case 9:
-            mecanum.move(1, 3 * -Math.PI / 2, 0);
+            mecanum.move(1, 3 * Math.PI / 2, 0);
             sleep(600);
             mecanum.stop();
             sleep(150);
@@ -606,7 +596,7 @@ public class IntellijAutonomous extends LinearOpMode {
             }
 
             if (isCalcCorrect) {
-              mecanumToPosition(-nextSkyStoneInches, 0.5);
+              mecanumToPosition(nextSkyStoneInches, 0.5);
             } else {
               nextSkyStone = 0;
               sleep(300);
@@ -614,7 +604,7 @@ public class IntellijAutonomous extends LinearOpMode {
                 if (vuforiaRead().equals("Stone Target")) {
                   break;
                 } else {
-                  mecanumToPosition(-Utilities.STONE_LENGHT, 0.8);
+                  mecanumToPosition(Utilities.STONE_LENGHT, 0.8);
                   sleep(800);
                   mecanum.stop();
                   sleep(300);
@@ -643,7 +633,7 @@ public class IntellijAutonomous extends LinearOpMode {
             sleep(320);
             mecanum.stop();
             mecanum.targetToPositionEncoders();
-            turnToPosition(17.6, 1);
+            turnToPosition(-17.6, 1);
             sleep(50);
             mecanum.withoutEncoders();
             mecanum.stop();
@@ -652,14 +642,14 @@ public class IntellijAutonomous extends LinearOpMode {
           case 11:
             colors = colorSensor.getNormalizedColors();
             colorsV = colorSensorVerifier.getNormalizedColors();
-            red = colors.red;
-            redV = colorsV.red;
-            while (red < Utilities.BLUE_COLOR || redV < Utilities.BLUE_VERIFIER_COLOR) {
+            blue = colors.blue;
+            blueV = colorsV.blue;
+            while (blue < Utilities.BLUE_COLOR || blueV < Utilities.BLUE_VERIFIER_COLOR) {
               mecanum.move(0, 0, 1);
               colors = colorSensor.getNormalizedColors();
               colorsV = colorSensorVerifier.getNormalizedColors();
-              red = colors.red;
-              redV = colorsV.red;
+              blue = colors.blue;
+              blueV = colorsV.blue;
             }
             mecanum.stop();
             mecanum.targetToPositionEncoders();
@@ -670,10 +660,9 @@ public class IntellijAutonomous extends LinearOpMode {
             sleep(300);
             BRZ.setPower(-0.35);
             moveToPosition(34, 1);
-            mecanum.withoutEncoders();
+            mecanum.stop();
             CUBO.setPosition(0);
             sleep(150);
-            mecanum.targetToPositionEncoders();
             BRZ.setPower(-0.35);
             moveToPosition(-51, 1);
             mecanum.stop();
@@ -693,7 +682,7 @@ public class IntellijAutonomous extends LinearOpMode {
   }
 
   public void moveToPosition(double inches, double speed) {
-    int move = (int) (Math.round(inches * conversion));
+    int move = (int) (Math.round(inches * Utilities.CONVERSION));
 
     IN_IZQ.setTargetPosition(IN_IZQ.getCurrentPosition() + move);
     SP_IZQ.setTargetPosition(SP_IZQ.getCurrentPosition() + move);
@@ -780,7 +769,7 @@ public class IntellijAutonomous extends LinearOpMode {
 
   public void mecanumToPosition(double inches, double speed) {
     mecanum.targetToPositionEncoders();
-    int move = (int) (Math.round(inches * conversion));
+    int move = (int) (Math.round(inches * Utilities.CONVERSION));
 
     IN_IZQ.setTargetPosition(IN_IZQ.getCurrentPosition() + move);
     SP_IZQ.setTargetPosition(SP_IZQ.getCurrentPosition() - move);
@@ -795,7 +784,7 @@ public class IntellijAutonomous extends LinearOpMode {
 
   public void turnToPosition(double inches, double speed) {
     mecanum.targetToPositionEncoders();
-    int move = (int) (Math.round(inches * conversion));
+    int move = (int) (Math.round(inches * Utilities.CONVERSION));
 
     IN_IZQ.setTargetPosition(IN_IZQ.getCurrentPosition() + move);
     IN_DRC.setTargetPosition(IN_DRC.getCurrentPosition() - move);
@@ -823,7 +812,6 @@ public class IntellijAutonomous extends LinearOpMode {
   public void regMatch(int id, double scan, double half, double finish){
     SQLiteHelper db_connect = new SQLiteHelper(null, Utilities.DATABASE_NAME, null, Utilities.DATABASE_VERSION);
     SQLiteDatabase db = db_connect.getWritableDatabase();
-
     ContentValues values = new ContentValues();
     values.put(Utilities.ID_INDEX, id);
     values.put(Utilities.SCAN_INDEX, scan);
