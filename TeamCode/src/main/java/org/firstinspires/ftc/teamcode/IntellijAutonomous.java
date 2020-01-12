@@ -298,8 +298,6 @@ public class IntellijAutonomous extends LinearOpMode {
             mecanum.withoutEncoders();
             mecanum.stop();
             BRZ.setPower(0);
-            red = colors.red;
-            redV = colorsV.red;
             while (red < Utilities.RED_COLOR || redV < Utilities.RED_VERIFIER_COLOR) {
               mecanum.move(0, 0, 1);
               colors = colorSensor.getNormalizedColors();

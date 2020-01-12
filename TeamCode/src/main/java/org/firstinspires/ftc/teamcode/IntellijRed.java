@@ -1,6 +1,6 @@
 /*
  *   Copyright (c) 2019 under MIT license. All rights reserved.
- *   Created by Manuel Díaz and Obed García with help of Paolo Reyes for WinT 15645 Subteam of WinT 3794
+ *   Created by Manuel Díaz and Paolo Reyes for WinT 15645 Subteam of WinT 3794
  *   This code was used in FIRST Tech Challenge 2019 - 2020
  */
 package org.firstinspires.ftc.teamcode;
@@ -11,36 +11,84 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import org.firstinspires.ftc.teamcode.helpers.LibTMOA;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.SwitchableLight;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.vuforia.CameraDevice;
-
+import com.vuforia.HINT;
+import com.vuforia.Image;
+import com.vuforia.PIXEL_FORMAT;
+import com.vuforia.Vuforia;
+import java.lang.annotation.Target;
+import java.lang.Thread;
 import java.util.ArrayList;
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
+import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.helpers.LibTMOA;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
-@Autonomous(name = "Red A", group = "Joker")
-
-public class RedA extends LinearOpMode{
+@Autonomous(name = "Red Alliance", group = "Joker")
+public class IntellijRed extends LinearOpMode {
   private ElapsedTime runtime = new ElapsedTime();
   private static final double stoneLength = 8.4;
-  
+
   public static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
   public static final boolean PHONE_IS_PORTRAIT = true;
   public static final String VUFORIA_KEY =
@@ -126,9 +174,9 @@ public class RedA extends LinearOpMode{
   private int stage = 0;
   private int nextSkyStone = -1;
   public byte allianceVelocity = 0;
-  
+
   @Override
-  public void runOpMode(){
+  public void runOpMode() {
     SP_DRC = hardwareMap.dcMotor.get("SP_DRC");
     IN_DRC = hardwareMap.dcMotor.get("IN_DRC");
     SP_IZQ = hardwareMap.dcMotor.get("SP_IZQ");
@@ -142,6 +190,7 @@ public class RedA extends LinearOpMode{
     CUBO = hardwareMap.servo.get("CUBO");
     RLQ = hardwareMap.servo.get("RLQ");
     colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
+
     //colorDetector =
     //  hardwareMap.get(NormalizedColorSensor.class, "colorDetector");
     colorSensorVerifier =
@@ -169,7 +218,7 @@ public class RedA extends LinearOpMode{
     JL_IZQ.setPosition(1);
     RLQ.setPosition(0);
     CUBO.setPosition(1);
-    
+
     mecanum =
       new LibTMOA(
         SP_IZQ,
@@ -268,154 +317,192 @@ public class RedA extends LinearOpMode{
     telemetry.addData("Status", "Waiting");
     telemetry.update();
     runtime.reset();
-    
+
     waitForStart();
-    
+
     runtime.startTime();
-    while (runtime.time() < 30 && opModeIsActive()) {
-        moveToPosition(24, 1);
-        sleep(100);
-        while (nextSkyStone < 4 && !vuforiaRead().equals("Stone Target")) {
+    while (runtime.time() < 600 && opModeIsActive()) {
+      switch (stage) {
+        case 0:
+          moveToPosition(24, 1);
+          sleep(100);
+          break;
+        case 1:
+          sleep(100);
+          while (nextSkyStone < 4 && !vuforiaRead().equals("Stone Target")) {
             mecanumToPosition(stoneLength, 0.8);
             sleep(400);
             mecanum.stop();
             nextSkyStone++;
             sleep(350);
           }
-        
-        speech.speak("Give me the rock, bitch!");
-        targetsSkyStone.deactivate();
-        mecanum.withoutEncoders();
-        mecanum.move(.8,Math.PI,0);
-        sleep(100);
-        mecanum.stop();
-        claw(1);
-        BRZ.setPower(-1);
-        turnToPosition(16.2, 1);
-        sleep(400);
-        mecanum.withoutEncoders();
-        mecanum.stop();
-        BRZ.setPower(0);
-        while (red < redC || redV < redVC) {
-          mecanum.move(0, 0, 1);
-          colors = colorSensor.getNormalizedColors();
-          colorsV = colorSensorVerifier.getNormalizedColors();
-          red = colors.red;
-          redV = colorsV.red;
-        }
-        mecanum.stop();
-        sleep(20);
-        mecanum.targetToPositionEncoders();
-        moveToPosition(34, 1);
-        turnToPosition(18, 1);
-        mecanum.stop();
-        sleep(50);
-        mecanum.withoutEncoders();
-        while (!foundation.isPressed()) {
-          mecanum.move(0.4, Math.PI, 0);
-        }
-        mecanum.stop();
-        JL_DRC.setPosition(1);
-        JL_IZQ.setPosition(0);
-        sleep(350);
-        mecanum.moveWithoutLimits(7 * Math.PI / 4);
-        sleep(1300);
-        mecanum.stop();
-        turnToPosition(20, 1);
-        sleep(50);
-        mecanum.withoutEncoders();
-        mecanum.stop();
-        JL_DRC.setPosition(0);
-        JL_IZQ.setPosition(1);
-        mecanum.move(1,3 * Math.PI / 2,0);
-        CUBO.setPosition(0);
-        BRZ.setPower(0.45);
-        sleep(70);
-        BRZ.setPower(0.35);
-        mecanum.move(-1, 0, 0);
-        sleep(1250);
-        BRZ.setPower(0);
-        mecanum.stop();
-        sleep(150);
-        mecanum.move(0, 0, 1);
-        CUBO.setPosition(1);
-        sleep(2050);
-        mecanum.stop();
-        turnToPosition(20.4, 1);
-        sleep(50);
-        mecanum.withoutEncoders();
-        mecanum.stop();
-        while (!(digitalTouch1.isPressed() || digitalTouch2.isPressed())) {
+          speech.speak("Give me the rock, bitch!");
+          targetsSkyStone.deactivate();
+          mecanum.withoutEncoders();
+          sleep(100);
+          break;
+        case 2:
           mecanum.move(.8, Math.PI, 0);
-        }
-        mecanum.stop();
-        sleep(250);
-        mecanum.targetToPositionEncoders();
-        moveToPosition(25, 1);
-        sleep(150);
-        mecanum.stop();
-        mecanum.withoutEncoders();
-        mecanum.move(1,3 * -Math.PI / 2,0);
-        sleep(600);
-        mecanum.stop();
-        sleep(150);
-        targetsSkyStone.activate();
-        while (nextSkyStone < 4 && !vuforiaRead().equals("Stone Target")) {
+          sleep(100);
+          mecanum.stop();
+          clawRed(1);
+          BRZ.setPower(-1);
+          turnToPosition(16.5, 1);
+          sleep(400);
+          break;
+        case 3:
+          mecanum.withoutEncoders();
+          mecanum.stop();
+          BRZ.setPower(0);
+          while (red < redC || redV < redVC) {
+            mecanum.move(0, 0, 1);
+            colors = colorSensor.getNormalizedColors();
+            colorsV = colorSensorVerifier.getNormalizedColors();
+            red = colors.red;
+            redV = colorsV.red;
+          }
+          mecanum.stop();
+          sleep(20);
+          break;
+        case 4:
+          mecanum.targetToPositionEncoders();
+          moveToPosition(34, 1);
+          turnToPosition(18.2, 1);
+          mecanum.stop();
+          sleep(50);
+          mecanum.withoutEncoders();
+          while (!foundation.isPressed()) {
+            mecanum.move(0.4, Math.PI, 0);
+          }
+          mecanum.stop();
+          sleep(50);
+          break;
+        case 5:
+          JL_DRC.setPosition(1);
+          JL_IZQ.setPosition(0);
+          CUBO.setPosition(0);
+          sleep(350);
+          mecanum.moveWithoutLimits(7 * Math.PI / 4);
+          sleep(1300);
+          mecanum.stop();
+          turnToPosition(20, 1);
+          sleep(50);
+          mecanum.withoutEncoders();
+          mecanum.stop();
+          sleep(50);
+          break;
+        case 6:
+          JL_DRC.setPosition(0);
+          JL_IZQ.setPosition(1);
+          mecanum.move(1, 3 * Math.PI / 2, 0);
+          CUBO.setPosition(0);
+          BRZ.setPower(1);
+          sleep(150);
+          BRZ.setPower(0.35);
+          mecanum.move(-1, 0, 0);
+          sleep(1250);
+          CUBO.setPosition(1);
+          sleep(200);
+          BRZ.setPower(0);
+          mecanum.stop();
+          sleep(150);
+          break;
+        case 7:
+          mecanum.move(0, 0, 1);
+          CUBO.setPosition(1);
+          sleep(2100);
+          mecanum.stop();
+          turnToPosition(20.4, 1);
+          sleep(50);
+          mecanum.withoutEncoders();
+          mecanum.stop();
+          sleep(20);
+          break;
+        case 8:
+          while (!(digitalTouch1.isPressed() || digitalTouch2.isPressed())) {
+            mecanum.move(.8, Math.PI, 0);
+          }
+          mecanum.stop();
+          sleep(250);
+          mecanum.targetToPositionEncoders();
+          moveToPosition(25, 1);
+          sleep(150);
+          mecanum.stop();
+          mecanum.withoutEncoders();
+          sleep(200);
+          break;
+        case 9:
+          targetsSkyStone.activate();
+          sleep(150);
+          while (nextSkyStone < 6 && !vuforiaRead().equals("Stone Target")) {
             mecanumToPosition(-stoneLength, 0.8);
             sleep(400);
             mecanum.stop();
             nextSkyStone++;
-            sleep(400);
+            sleep(350);
           }
-        
-        speech.speak("Give me the rock, bitch!");
-        targetsSkyStone.deactivate();
-        mecanum.withoutEncoders();
-        mecanum.move(.8,Math.PI,0);
-        sleep(100);
-        mecanum.stop();
-        claw2(1);
-        mecanum.stop();
-        mecanum.move(-1, 0, 0);
-        sleep(320);
-        mecanum.stop();
-        mecanum.targetToPositionEncoders();
-        turnToPosition(17.6, 1);
-        sleep(50);
-        mecanum.withoutEncoders();
-        mecanum.stop();
-        colors = colorSensor.getNormalizedColors();
-        colorsV = colorSensorVerifier.getNormalizedColors();
-        red = colors.red;
-        redV = colorsV.red;
-        while (red < redC || redV < redVC) {
-          mecanum.move(0, 0, 1);
+          speech.speak("Give me the rock, bitch!");
+          targetsSkyStone.deactivate();
+          mecanum.withoutEncoders();
+          sleep(100);
+          break;
+        case 10:
+          mecanum.withoutEncoders();
+          mecanum.move(.8, Math.PI, 0);
+          sleep(100);
+          mecanum.stop();
+          if(nextSkyStone == 3){
+            clawRed2(0);
+          }else{
+            clawRed2(1);
+          }
+          mecanum.move(-1, 0, 0);
+          sleep(320);
+          mecanum.stop();
+          mecanum.targetToPositionEncoders();
+          turnToPosition(18.5, 1);
+          sleep(50);
+          mecanum.withoutEncoders();
+          mecanum.stop();
+          sleep(20);
           colors = colorSensor.getNormalizedColors();
           colorsV = colorSensorVerifier.getNormalizedColors();
           red = colors.red;
           redV = colorsV.red;
-        }
-        mecanum.stop();
-        mecanum.targetToPositionEncoders();
-        BRZ.setPower(-1);
-        sleep(300);
-        BRZ.setPower(-0.35);
-        moveToPosition(34, 1);
-        mecanum.withoutEncoders();
-        CUBO.setPosition(0);
-        sleep(150);
-        mecanum.targetToPositionEncoders();
-        BRZ.setPower(-0.35);
-        moveToPosition(-51, 1);
-        mecanum.stop();
-        BRZ.setPower(0);
-
-        telemetry.addData("Step", "Terminado");
-            mecanum.stop();
-            break;
+          while (red < redC || redV < redVC) {
+            mecanum.move(0, 0, 1);
+            colors = colorSensor.getNormalizedColors();
+            colorsV = colorSensorVerifier.getNormalizedColors();
+            red = colors.red;
+            redV = colorsV.red;
           }
-          telemetry.update();
-        }
+          mecanum.stop();
+          mecanum.targetToPositionEncoders();
+          sleep(20);
+          BRZ.setPower(-1);
+          sleep(280);
+          BRZ.setPower(-0.35);
+          moveToPosition(34, 1);
+          mecanum.withoutEncoders();
+          CUBO.setPosition(0);
+          sleep(150);
+          mecanum.targetToPositionEncoders();
+          BRZ.setPower(-0.35);
+          moveToPosition(-51, 1);
+          mecanum.stop();
+          BRZ.setPower(0);
+          sleep(20);
+          break;
+        default:
+          telemetry.addData("Step", "Terminado");
+          mecanum.stop();
+          sleep(50);
+          break;
+      }
+      telemetry.update();
+      stage++;
+    }
+  }
 
   private void climbElevator(double speed) {
     ELE_P.setPower(speed);
@@ -426,7 +513,7 @@ public class RedA extends LinearOpMode{
   private void climbArm(double speed) {
     BRZ.setPower(speed);
   }
-  
+
   public void moveToPosition(double inches, double speed) {
     int move = (int) (Math.round(inches * conversion));
 
@@ -474,11 +561,11 @@ public class RedA extends LinearOpMode{
     SP_DRC.setPower(-input);
     IN_DRC.setPower(-input);
   }
-  
-  public void claw(double orient) {
+
+  public void clawRed(double orient) {
     CUBO.setPosition(0);
     mecanum.move(0.700, orient * Math.PI / 2, 0);
-    sleep(220);
+    sleep(280);
     mecanum.stop();
     BRZ.setPower(1);
     sleep(750);
@@ -492,8 +579,8 @@ public class RedA extends LinearOpMode{
     sleep(130);
     return;
   }
-  
-  public void claw2(double orient) {
+
+  public void clawRed2(double orient) {
     CUBO.setPosition(0);
     BRZ.setPower(1);
     sleep(750);
@@ -509,8 +596,7 @@ public class RedA extends LinearOpMode{
     sleep(700);
     return;
   }
-  
-  
+
   public String vuforiaRead() {
     CameraDevice.getInstance().setFlashTorchMode(true);
     String target = "";
@@ -525,7 +611,7 @@ public class RedA extends LinearOpMode{
     }
     return target;
   }
-  
+
   public void mecanumToPosition(double inches, double speed) {
     mecanum.targetToPositionEncoders();
     int move = (int) (Math.round(inches * conversion));
@@ -553,7 +639,7 @@ public class RedA extends LinearOpMode{
     }*/
     return;
   }
-  
+
   public void turnToPosition(double inches, double speed) {
     mecanum.targetToPositionEncoders();
     int move = (int) (Math.round(inches * conversion));
@@ -567,7 +653,7 @@ public class RedA extends LinearOpMode{
     IN_IZQ.setPower(speed);
     SP_DRC.setPower(speed);
     IN_DRC.setPower(speed);
-    
+
     while (
       SP_IZQ.isBusy() && SP_DRC.isBusy() && IN_IZQ.isBusy() && IN_DRC.isBusy()
     ) {
