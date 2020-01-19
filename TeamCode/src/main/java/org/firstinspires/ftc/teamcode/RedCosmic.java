@@ -1,6 +1,6 @@
 /*
  *   Copyright (c) 2019 under MIT license. All rights reserved.
- *   Created by Manuel Díaz and Obed García with help of Paolo Reyes for WinT 15645 Subteam of WinT 3794
+ *   Created by Manuel Díaz and Paolo Reyes for WinT 15645 Subteam of WinT 3794
  *   This code was used in FIRST Tech Challenge 2019 - 2020
  */
 package org.firstinspires.ftc.teamcode;
@@ -16,6 +16,8 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import org.firstinspires.ftc.teamcode.helpers.LibTMOA;
+import org.firstinspires.ftc.teamcode.helpers.Utilities;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -82,27 +84,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.helpers.LibTMOA;
 
-@Autonomous
-public class IA extends LinearOpMode {
-  public static final double allianceFieldMultiplier = 46;
-  public static final double blockSectionSeparator = 47;
-  public static final double fieldMultiplier = 0;
-  public static final double stoneLength = 9;
-
-  public static final double roadToFoundation = 40;
-  public static final double roadToBase = 50;
-  public static final double timeOutSkyBridgeColor = 5;
-  public static final double timeOutFoundationResearch = 0;
-
-  public static final double diagonalMovement = 0;
-  public static final double backMovement = 0;
-
-  public static final double robotBackDistance = 0;
-  public static final double robotBackDistanceLimit = 0;
-
+@Autonomous(name = "Red Cosmic", group = "Joker")
+public class RedCosmic extends LinearOpMode {
   private ElapsedTime runtime = new ElapsedTime();
+  private static final double stoneLength = 8.4;
 
   public static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
   public static final boolean PHONE_IS_PORTRAIT = true;
@@ -113,7 +99,6 @@ public class IA extends LinearOpMode {
   public static final float mmTargetHeight = (6) * mmPerInch;
 
   public static final float stoneZ = 2.00f * mmPerInch;
-
   private Orientation angles;
   private Acceleration gravity;
 
@@ -137,13 +122,17 @@ public class IA extends LinearOpMode {
   Double cpi = (cpr * gearratio) / (Math.PI * diameter);
   Double bias = 0.91;
   Double meccyBias = 0.9;
+  Double conversion = cpi * bias;
 
   public static final double redC = 0.03;
   public static final double redVC = 0.007;
+  private boolean isCalcCorrect = true;
+  private double nextSkyStoneInches = 0;
   private boolean skystoneTarget = false;
   private boolean flag = true;
   public boolean alliance = true;
   private boolean init = true;
+  Boolean exit = false;
   private OpenGLMatrix lastLocation = null;
   private VuforiaLocalizer vuforia = null;
   private boolean targetVisible = false;
@@ -171,7 +160,6 @@ public class IA extends LinearOpMode {
   private List<VuforiaTrackable> allTrackables;
   public VuforiaTrackables targetsSkyStone;
   private AndroidTextToSpeech speech;
-  private Thread thread;
 
   private double distance = 0;
   private boolean initMoving = true;
@@ -184,6 +172,8 @@ public class IA extends LinearOpMode {
   public double allianceMultiplicator = 0;
   double jsX = 0;
   double jsRY = 0;
+  private int stage = 0;
+  private int nextSkyStone = -1;
   public byte allianceVelocity = 0;
 
   @Override
@@ -201,8 +191,9 @@ public class IA extends LinearOpMode {
     CUBO = hardwareMap.servo.get("CUBO");
     RLQ = hardwareMap.servo.get("RLQ");
     colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
-    colorDetector =
-      hardwareMap.get(NormalizedColorSensor.class, "colorDetector");
+
+    //colorDetector =
+    //  hardwareMap.get(NormalizedColorSensor.class, "colorDetector");
     colorSensorVerifier =
       hardwareMap.get(NormalizedColorSensor.class, "colorSensorVerifier");
 
@@ -227,6 +218,7 @@ public class IA extends LinearOpMode {
     JL_DRC.setPosition(0);
     JL_IZQ.setPosition(1);
     RLQ.setPosition(0);
+    CUBO.setPosition(1);
 
     mecanum =
       new LibTMOA(
@@ -239,7 +231,6 @@ public class IA extends LinearOpMode {
         gearratio,
         diameter
       );
-    thread = new Threading(this);
 
     int cameraMonitorViewId = hardwareMap
       .appContext.getResources()
@@ -322,46 +313,170 @@ public class IA extends LinearOpMode {
     speech.setLanguageAndCountry("en", "US");
 
     sleep(1000);
-    speech.speak("Select your alliance and go");
+    speech.speak("Waiting to start.");
     while (speech.isSpeaking());
-
-    while (flag) {
-      if (digitalTouch1.isPressed()) {
-        speech.speak("Red Alliance Selected");
-        telemetry.addLine(">> Ready to go: Red Alliance");
-        alliance = true;
-        flag = false;
-
-        allianceMultiplicator = 1;
-      } else if (digitalTouch2.isPressed()) {
-        speech.speak("Blue Alliance Selected");
-        telemetry.addLine(">> Ready to go: Blue Alliance");
-        alliance = false;
-        flag = false;
-
-        allianceMultiplicator = 3;
-      }
-    }
-
+    telemetry.addData("Status", "Waiting");
     telemetry.update();
+    runtime.reset();
+
     waitForStart();
 
-    thread.start();
-    while (opModeIsActive()) {/*
-      try {
-        thread.sleep(500);
-      } catch (InterruptedException e) {
-        telemetry.addData("Status", "Thread Failed");
-        telemetry.addData("Status", "Initializing Recovery Mode");
-      }*/
-      telemetry.addData("Status - Thread A", "Working - Parallel Controller");
-      if (thread.isAlive()) {
-        telemetry.addData(
-          "Status - Thread B",
-          "Working - Linear Map Controller"
-        );
+    runtime.startTime();
+    while (runtime.time() < 600 && opModeIsActive()) {
+      switch (stage) {
+        case 0:
+          moveToPosition(23,1);
+          sleep(100);
+          break;
+        case 1:
+          sleep(100);
+          while (nextSkyStone < 4 && !vuforiaRead().equals(Utilities.LABEL_SS)) {
+            mecanumToPosition(Utilities.STONE_LENGTH, 0.8);
+            sleep(400);
+            mecanum.stop();
+            nextSkyStone++;
+            sleep(500);
+          }
+          speech.speak("Ya se supo Irbing");
+          sleep(100);
+          mecanum.usingEncoders();
+          break;
+        case 2:
+          mecanum.move(.8, Math.PI, 0);
+          sleep(100);
+          mecanum.stop();
+          clawRed(1);
+          mecanum.move(-1, 0, 0);
+          sleep(250);
+          mecanum.stop();
+          turnToPosition(15.5, 1);
+          sleep(400);
+          break;
+        case 3:
+          mecanum.withoutEncoders();
+          sleep(20);
+          mecanum.stop();
+          sleep(20);
+          mecanum.usingBrake();
+          BRZ.setPower(0);
+          while (red < Utilities.RED_COLOR || redV < Utilities.RED_VERIFIER_COLOR) {
+            mecanum.move(1,0,0);
+            colors = colorSensor.getNormalizedColors();
+            colorsV = colorSensorVerifier.getNormalizedColors();
+            red = colors.red;
+            redV = colorsV.red;
+          }
+          mecanum.stop();
+          sleep(20);
+          break;
+        case 4:
+          mecanum.targetToPositionEncoders();
+          BRZ.setPower(-1);
+          sleep(180);
+          BRZ.setPower(-0.314);
+          moveToPosition(14,1);
+          sleep(500);
+          CUBO.setPosition(0);
+          sleep(200);
+          mecanum.withoutEncoders();
+          BRZ.setPower(-1);
+          sleep(500);
+          BRZ.setPower(0);
+          while (red < Utilities.RED_COLOR || redV < Utilities.RED_VERIFIER_COLOR) {
+            mecanum.move(0.8, Math.PI, 0);
+            colors = colorSensor.getNormalizedColors();
+            colorsV = colorSensorVerifier.getNormalizedColors();
+            red = colors.red;
+            redV = colorsV.red;
+          }
+          sleep(35);
+          break;
+        case 5:
+          mecanum.targetToPositionEncoders();
+          moveToPosition(-75,1);
+          turnToPosition(-19,1);
+          moveToPosition(3,1);
+          mecanum.stop();
+          sleep(600);
+          while (nextSkyStone < 4 && !vuforiaRead().equals(Utilities.LABEL_SS)) {
+            mecanumToPosition(-Utilities.STONE_LENGTH, 0.8);
+            sleep(400);
+            mecanum.stop();
+            nextSkyStone++;
+            sleep(350);
+          }
+          speech.speak("El acosador!");
+          sleep(100);
+          targetsSkyStone.deactivate();
+          mecanum.usingEncoders();
+          sleep(100);
+          break;
+       
+        case 6:
+                    mecanum.move(.8, Math.PI, 0);
+          sleep(100);
+          mecanum.stop();
+          if(nextSkyStone == 3){
+            clawRed2(0);
+          }else{
+            clawRed2(1);
+          }
+          mecanum.withoutEncoders();
+          turnperseconds(.5);
+          sleep(70);
+          mecanum.stop();
+          while (!(digitalTouch1.isPressed() || digitalTouch2.isPressed())) {
+            mecanum.move(-1, 0, 0);
+          }
+          mecanum.stop();
+          mecanum.targetToPositionEncoders();
+          moveToPosition(10, 1);
+          turnToPosition(17, 1);
+          sleep(50);
+          mecanum.withoutEncoders();
+          mecanum.stop();
+          sleep(20);
+          colors = colorSensor.getNormalizedColors();
+          colorsV = colorSensorVerifier.getNormalizedColors();
+          red = colors.red;
+          redV = colorsV.red;
+          while (red < redC || redV < redVC) {
+            mecanum.move(0, 0, 1);
+            colors = colorSensor.getNormalizedColors();
+            colorsV = colorSensorVerifier.getNormalizedColors();
+            red = colors.red;
+            redV = colorsV.red;
+          }
+          mecanum.stop();
+          mecanum.targetToPositionEncoders();
+          sleep(20);
+          BRZ.setPower(-1);
+          sleep(280);
+          BRZ.setPower(-0.35);
+          moveToPosition(14, 1);
+          mecanum.withoutEncoders();
+          CUBO.setPosition(0);
+          sleep(300);
+          mecanum.targetToPositionEncoders();
+          BRZ.setPower(-1);
+          sleep(250);
+          moveToPosition(-20, 1);
+          mecanum.stop();
+          BRZ.setPower(0);
+          sleep(20);
+          mecanum.withoutEncoders();
+          mecanum.move(1,-Math.PI/2,0);
+          sleep(600);
+          mecanum.stop();
+          break;
+        default:
+          telemetry.addData("Step", "Terminado");
+          mecanum.stop();
+          sleep(50);
+          break;
       }
       telemetry.update();
+      stage++;
     }
   }
 
@@ -375,22 +490,87 @@ public class IA extends LinearOpMode {
     BRZ.setPower(speed);
   }
 
-  public double devertify(double degrees) {
-    if (degrees < 0) {
-      degrees = degrees + 360;
+  public void moveToPosition(double inches, double speed) {
+    int move = (int) (Math.round(inches * conversion));
+
+    IN_IZQ.setTargetPosition(IN_IZQ.getCurrentPosition() + move);
+    SP_IZQ.setTargetPosition(SP_IZQ.getCurrentPosition() + move);
+    IN_DRC.setTargetPosition(IN_DRC.getCurrentPosition() + move);
+    SP_DRC.setTargetPosition(SP_DRC.getCurrentPosition() + move);
+
+    SP_IZQ.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    SP_DRC.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    IN_IZQ.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    IN_DRC.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+    SP_IZQ.setPower(speed);
+    IN_IZQ.setPower(speed);
+    SP_DRC.setPower(speed);
+    IN_DRC.setPower(speed);
+
+    while (
+      SP_IZQ.isBusy() && SP_DRC.isBusy() && IN_IZQ.isBusy() && IN_DRC.isBusy()
+    ) {
+      if (exit) {
+        SP_DRC.setPower(0);
+        SP_IZQ.setPower(0);
+        IN_DRC.setPower(0);
+        IN_IZQ.setPower(0);
+        return;
+      }
     }
-    return degrees;
+    SP_DRC.setPower(0);
+    SP_IZQ.setPower(0);
+    IN_DRC.setPower(0);
+    IN_IZQ.setPower(0);
+    return;
   }
 
-  public double convertify(double degrees) {
-    if (degrees > 179) {
-      degrees = -(360 - degrees);
-    } else if (degrees < -180) {
-      degrees = 360 + degrees;
-    } else if (degrees > 360) {
-      degrees = degrees - 360;
-    }
-    return degrees;
+  public void turnWithEncoder(double input) {
+    SP_IZQ.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    IN_IZQ.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    SP_DRC.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    IN_DRC.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+    SP_IZQ.setPower(input);
+    IN_IZQ.setPower(input);
+    SP_DRC.setPower(-input);
+    IN_DRC.setPower(-input);
+  }
+
+  public void clawRed(double orient) {
+    CUBO.setPosition(0);
+    mecanum.move(0.700, orient * Math.PI / 2, 0);
+    sleep(280);
+    mecanum.stop();
+    BRZ.setPower(1);
+    sleep(750);
+    BRZ.setPower(0);
+    mecanum.move(1, 0, 0);
+    sleep(180);
+    mecanum.stop();
+    CUBO.setPosition(1);
+    sleep(700);
+    mecanum.move(-1, 0, 0);
+    sleep(130);
+    return;
+  }
+
+  public void clawRed2(double orient) {
+    CUBO.setPosition(0);
+    BRZ.setPower(1);
+    sleep(750);
+    BRZ.setPower(0);
+    mecanum.withoutEncoders();
+    turnperseconds(-.5);
+    sleep(80);
+    mecanum.stop();
+    mecanum.move(0.8, 0, 0);
+    sleep(400);
+    mecanum.stop();
+    CUBO.setPosition(1);
+    sleep(700);
+    return;
   }
 
   public String vuforiaRead() {
@@ -407,4 +587,56 @@ public class IA extends LinearOpMode {
     }
     return target;
   }
+
+  public void mecanumToPosition(double inches, double speed) {
+    mecanum.targetToPositionEncoders();
+    int move = (int) (Math.round(inches * conversion));
+
+    IN_IZQ.setTargetPosition(IN_IZQ.getCurrentPosition() + move);
+    SP_IZQ.setTargetPosition(SP_IZQ.getCurrentPosition() - move);
+    IN_DRC.setTargetPosition(IN_DRC.getCurrentPosition() - move);
+    SP_DRC.setTargetPosition(SP_DRC.getCurrentPosition() + move);
+
+    SP_IZQ.setPower(mecanum.calc2(speed, 0, 0));
+    IN_IZQ.setPower(mecanum.calc1(speed, 0, 0));
+    SP_DRC.setPower(mecanum.calc1(speed, 0, 0));
+    IN_DRC.setPower(mecanum.calc2(speed, 0, 0));
+
+    return;
+  }
+
+  public void turnToPosition(double inches, double speed) {
+    mecanum.targetToPositionEncoders();
+    int move = (int) (Math.round(inches * conversion));
+
+    IN_IZQ.setTargetPosition(IN_IZQ.getCurrentPosition() + move);
+    IN_DRC.setTargetPosition(IN_DRC.getCurrentPosition() - move);
+    SP_DRC.setTargetPosition(SP_DRC.getCurrentPosition() - move);
+    SP_IZQ.setTargetPosition(SP_IZQ.getCurrentPosition() + move);
+
+    SP_IZQ.setPower(speed);
+    IN_IZQ.setPower(speed);
+    SP_DRC.setPower(speed);
+    IN_DRC.setPower(speed);
+
+    while (
+      SP_IZQ.isBusy() && SP_DRC.isBusy() && IN_IZQ.isBusy() && IN_DRC.isBusy()
+    ) {
+      if (exit) {
+        SP_DRC.setPower(0);
+        SP_IZQ.setPower(0);
+        IN_DRC.setPower(0);
+        IN_IZQ.setPower(0);
+        return;
+      }
+    }
+    return;
+  }
+  
+    public void turnperseconds (double speed){
+    SP_IZQ.setPower(speed);
+    IN_IZQ.setPower(speed);
+    SP_DRC.setPower(-speed);
+    IN_DRC.setPower(-speed);
+    }
 }

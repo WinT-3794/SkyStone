@@ -227,9 +227,6 @@ public class TeleOp2020 extends LinearOpMode {
           JL_DRC.setPosition(0);
         }
 
-        if (Math.abs(gamepad1.left_stick_x) > 0.7) {
-          mecanum.rotateIn(gamepad1.left_stick_x - 0.2);
-        }
 
         telemetry.addLine("Vd: " + Vd);
         telemetry.addLine("Td: " + Td);
