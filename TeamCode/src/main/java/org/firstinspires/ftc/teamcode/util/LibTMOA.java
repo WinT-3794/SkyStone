@@ -4,7 +4,7 @@
  *   This code was used in FIRST Tech Challenge 2019 - 2020
  *   Trigonometric Mecanum Omnidriving Algorithm
  */
-package org.firstinspires.ftc.teamcode.helpers;
+package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;

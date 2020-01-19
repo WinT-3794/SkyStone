@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.helpers;
+package org.firstinspires.ftc.teamcode.util;
 
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 
@@ -41,6 +41,10 @@ public class Utilities {
     public static final double BLUE_COLOR = 0.035;
     public static final double BLUE_VERIFIER_COLOR = 0.006;
 
+    public static final float PHONE_X_ROTATE = 90;
+    public static final float PHONE_Y_ROTATE = -90;
+    public static final float PHONE_Z_ROTATE = 0;
+
     public static final double WIDTH = 16.16;
     public static final int CPR = 28;
     public static final int GEAR_RATIO = 20;
@@ -49,4 +53,13 @@ public class Utilities {
     public static final double BIAS = 0.91;
     public static final double MECCY_BIAS = 0.9;
     public static final double CONVERTION = CPI * BIAS;
+
+    public static final float BRIDGE_Z = 6.42f * MM_PER_INCH;
+    public static final float BRIDGE_Y = 23 * MM_PER_INCH;
+    public static final float BRIDGE_X = 5.18f * MM_PER_INCH;
+    public static final float BRIDGE_ROT_Y = 59;
+    public static final float BRDIGE_ROT_X = 180;
+
+    public static final float HALF_FIELD = 72 * MM_PER_INCH;
+    public static final float QUAD_FIELD = 36 * MM_PER_INCH;
 }
