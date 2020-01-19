@@ -215,6 +215,17 @@ public class LibTMOA {
     IN_IZQ.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     IN_DRC.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
   }
+  
+  public void usingEncoders() {
+    SP_IZQ.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    SP_DRC.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    IN_IZQ.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    IN_DRC.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    SP_IZQ.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    SP_DRC.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    IN_IZQ.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    IN_DRC.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+  }
 
   public void targetToPositionEncoders() {
     IN_IZQ.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

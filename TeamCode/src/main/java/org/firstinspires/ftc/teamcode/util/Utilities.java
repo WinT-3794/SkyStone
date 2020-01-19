@@ -12,11 +12,18 @@ public class Utilities {
     public static final String SCAN_INDEX = "scan";
     public static final String HALF_INDEX = "half";
     public static final String FINAL_INDEX = "final";
+    
+    public static final String TFOD_MODEL_ASSET = "Skystone.tflite";
+    public static final String LABEL_FIRST_ELEMENT = "Stone";
+    public static final String LABEL_SECOND_ELEMENT = "Skystone";
+    
+    public static final String LABEL_SS = "Stone Target";
+    public static final String LABEL_S = "Stone";
 
     public static final String CREATE_TABLE = "CREATE TABLE "+ TABLE_NAME +" ("+ ID_INDEX +" INTEGER PRIMARY KEY, "+ SCAN_INDEX +" INTEGER, "+ HALF_INDEX +" INTEGER, "+ FINAL_INDEX +" INTEGER)";
     public static final String DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
-    public static final double STONE_LENGHT = 8.4;
+    public static final double STONE_LENGTH = 8.4;
     public static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
     public static final boolean PHONE_IS_PORTRAIT = true;
     public static final String VUFORIA_KEY =
@@ -28,11 +35,11 @@ public class Utilities {
     public static final float CAMERA_VERTICAL_DISPLACEMENT = 8.0f * Utilities.MM_PER_INCH;
     public static final float CAMERA_LEFT_DISPLACEMENT = 0;
 
-    public static final double RED_COLOR = 0.03;
-    public static final double RED_VERIFIER_COLOR = 0.007;
+    public static final double RED_COLOR = 0.05;
+    public static final double RED_VERIFIER_COLOR = 0.01;
 
-    public static final double BLUE_COLOR = 0.03;
-    public static final double BLUE_VERIFIER_COLOR = 0.007;
+    public static final double BLUE_COLOR = 0.035;
+    public static final double BLUE_VERIFIER_COLOR = 0.006;
 
     public static final double WIDTH = 16.16;
     public static final int CPR = 28;
@@ -41,5 +48,5 @@ public class Utilities {
     public static final double CPI = (CPR * GEAR_RATIO) / (Math.PI * DIAMETER);
     public static final double BIAS = 0.91;
     public static final double MECCY_BIAS = 0.9;
-    public static final double CONVERSION = CPI * BIAS;
+    public static final double CONVERTION = CPI * BIAS;
 }

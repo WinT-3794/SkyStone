@@ -6,7 +6,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
-import com.qualcomm.robotcore.util.Util;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
@@ -85,8 +84,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
-@Autonomous(name = "Blue Alliance", group = "Joker")
-public class IntellijBlue extends LinearOpMode {
+@Autonomous(name = "Red Alliance", group = "Joker")
+public class IntellijRed extends LinearOpMode {
   private ElapsedTime runtime = new ElapsedTime();
   private static final double stoneLength = 8.4;
 
@@ -124,8 +123,8 @@ public class IntellijBlue extends LinearOpMode {
   Double meccyBias = 0.9;
   Double conversion = cpi * bias;
 
-  public static final double blueC = 0.03;
-  public static final double blueVC = 0.007;
+  public static final double redC = 0.03;
+  public static final double redVC = 0.007;
   private boolean isCalcCorrect = true;
   private double nextSkyStoneInches = 0;
   private boolean skystoneTarget = false;
@@ -166,8 +165,8 @@ public class IntellijBlue extends LinearOpMode {
   public NormalizedRGBA colors;
   public NormalizedRGBA colorsV;
   public float allianceColor = 0;
-  public float blue = 0;
-  public float blueV = 0;
+  public float red = 0;
+  public float redV = 0;
   private int change = 0;
   public double allianceMultiplicator = 0;
   double jsX = 0;
@@ -321,17 +320,17 @@ public class IntellijBlue extends LinearOpMode {
 
     waitForStart();
 
-        runtime.startTime();
-        while (runtime.time() < 600 && opModeIsActive()) {
+    runtime.startTime();
+    while (runtime.time() < 600 && opModeIsActive()) {
       switch (stage) {
         case 0:
-          moveToPosition(24, 1);
+          moveToPosition(23, 1);
           sleep(100);
           break;
         case 1:
           sleep(100);
           while (nextSkyStone < 4 && !vuforiaRead().equals("Stone Target")) {
-            mecanumToPosition(-stoneLength, 0.8);
+            mecanumToPosition(stoneLength, 0.8);
             sleep(400);
             mecanum.stop();
             nextSkyStone++;
@@ -346,29 +345,33 @@ public class IntellijBlue extends LinearOpMode {
           mecanum.move(.8, Math.PI, 0);
           sleep(100);
           mecanum.stop();
-          clawBlue(1);
+          clawRed(1);
+          mecanum.move(-1, 0, 0);
+          sleep(150);
+          mecanum.stop();
           BRZ.setPower(-1);
-          turnToPosition(-23, 1);
-          sleep(600);
+          turnToPosition(15, 1);
+          sleep(400);
           break;
         case 3:
           mecanum.withoutEncoders();
           mecanum.stop();
           BRZ.setPower(0);
-          while (blue < blueC || blueV < blueVC) {
+          while (red < redC || redV < redVC) {
             mecanum.move(0, 0, 1);
             colors = colorSensor.getNormalizedColors();
             colorsV = colorSensorVerifier.getNormalizedColors();
-            blue = colors.blue;
-            blueV = colorsV.blue;
+            red = colors.red;
+            redV = colorsV.red;
           }
           mecanum.stop();
           sleep(20);
           break;
         case 4:
           mecanum.targetToPositionEncoders();
-          moveToPosition(33.5, 1);
-          turnToPosition(-19.2, 1);
+          moveToPosition(41, 1);
+          turnToPosition(17.5, 1);
+          sleep(500);
           mecanum.stop();
           sleep(50);
           mecanum.withoutEncoders();
@@ -381,63 +384,59 @@ public class IntellijBlue extends LinearOpMode {
         case 5:
           JL_DRC.setPosition(1);
           JL_IZQ.setPosition(0);
-          CUBO.setPosition(0);
           sleep(350);
-          mecanum.moveWithoutLimits(Math.PI / 4);
-          sleep(1300);
-          mecanum.stop();
-          turnToPosition(-23, 1);
-          sleep(50);
+          mecanum.targetToPositionEncoders();
+          moveToPosition(30,1);
+          mecanum.turnToPosition(70, 1);
           mecanum.withoutEncoders();
-          mecanum.stop();
-          sleep(50);
+          sleep(1500);
+          break;
+        case 6:
           JL_DRC.setPosition(0);
           JL_IZQ.setPosition(1);
-          mecanum.move(1, 3 * -Math.PI / 2, 0);
           CUBO.setPosition(0);
           BRZ.setPower(1);
           sleep(150);
-          BRZ.setPower(0.35);
+          BRZ.setPower(0.19);
           mecanum.move(-1, 0, 0);
-          sleep(1250);
+          sleep(600);
           CUBO.setPosition(1);
           sleep(200);
           BRZ.setPower(0);
           mecanum.stop();
           sleep(150);
-          break;
-        case 6:
-          mecanum.move(0, 0, 1);
-          sleep(2100);
+          mecanum.targetToPositionEncoders();
+          moveToPosition(10, 1);
           mecanum.stop();
-          turnToPosition(-20.4, 1);
+          break;
+        case 7:
+          targetsSkyStone.activate();
+          mecanum.targetToPositionEncoders();
+          mecanum.turnToPosition(-17.3,1);
+          sleep(600);
+          mecanum.stop();
+          mecanum.withoutEncoders();
+          mecanum.move(0, 0, 1);
+          sleep(2150);
+          mecanum.stop();
+          mecanum.targetToPositionEncoders();
+          turnToPosition(17, 1);
           sleep(50);
           mecanum.withoutEncoders();
           mecanum.stop();
-          sleep(20);
-          break;
-        case 7:
-          while (!(digitalTouch1.isPressed() || digitalTouch2.isPressed())) {
-            mecanum.move(.8, Math.PI, 0);
-          }
-          mecanum.stop();
-          sleep(250);
-          mecanum.targetToPositionEncoders();
-          moveToPosition(25, 1);
-          sleep(150);
-          mecanum.stop();
-          mecanum.withoutEncoders();
-          sleep(200);
           break;
         case 8:
-          targetsSkyStone.activate();
-          sleep(150);
-          while (nextSkyStone < 6 && !vuforiaRead().equals("Stone Target")) {
-            mecanumToPosition(stoneLength, 0.8);
-            sleep(400);
-            mecanum.stop();
-            nextSkyStone++;
-            sleep(350);
+          sleep(300);
+          if(!vuforiaRead().equals("Stone Target")) {
+            sleep(300);
+          }
+          if(!vuforiaRead().equals("Stone Target")){
+            while (!vuforiaRead().equals("Stone Target")) {
+              mecanumToPosition(-stoneLength, 0.8);
+              sleep(400);
+              mecanum.stop();
+              sleep(350);
+            }
           }
           speech.speak("Give me the rock, bitch!");
           targetsSkyStone.deactivate();
@@ -445,34 +444,40 @@ public class IntellijBlue extends LinearOpMode {
           sleep(100);
           break;
         case 9:
-          mecanum.withoutEncoders();
+      
           mecanum.move(.8, Math.PI, 0);
           sleep(100);
           mecanum.stop();
           if(nextSkyStone == 3){
-            clawBlue2(0);
+            clawRed2(0);
           }else{
-            clawBlue2(1);
+            clawRed2(1);
           }
-          mecanum.move(-1, 0, 0);
-          sleep(320);
+          mecanum.withoutEncoders();
+          turnperseconds(.5);
+          sleep(70);
+          mecanum.stop();
+          while (!(digitalTouch1.isPressed() || digitalTouch2.isPressed())) {
+            mecanum.move(-1, 0, 0);
+          }
           mecanum.stop();
           mecanum.targetToPositionEncoders();
-          turnToPosition(-25, 1);
+          moveToPosition(3, 1);
+          turnToPosition(16, 1);
           sleep(50);
           mecanum.withoutEncoders();
           mecanum.stop();
           sleep(20);
           colors = colorSensor.getNormalizedColors();
           colorsV = colorSensorVerifier.getNormalizedColors();
-          blue = colors.blue;
-          blueV = colorsV.blue;
-          while (blue < blueC || blueV < blueVC) {
+          red = colors.red;
+          redV = colorsV.red;
+          while (red < redC || redV < redVC) {
             mecanum.move(0, 0, 1);
             colors = colorSensor.getNormalizedColors();
             colorsV = colorSensorVerifier.getNormalizedColors();
-            blue = colors.blue;
-            blueV = colorsV.blue;
+            red = colors.red;
+            redV = colorsV.red;
           }
           mecanum.stop();
           mecanum.targetToPositionEncoders();
@@ -480,13 +485,13 @@ public class IntellijBlue extends LinearOpMode {
           BRZ.setPower(-1);
           sleep(280);
           BRZ.setPower(-0.35);
-          moveToPosition(34, 1);
+          moveToPosition(15, 1);
           mecanum.withoutEncoders();
           CUBO.setPosition(0);
           sleep(150);
           mecanum.targetToPositionEncoders();
           BRZ.setPower(-0.35);
-          moveToPosition(-51, 1);
+          moveToPosition(-25, 1);
           mecanum.stop();
           BRZ.setPower(0);
           sleep(20);
@@ -560,9 +565,9 @@ public class IntellijBlue extends LinearOpMode {
     IN_DRC.setPower(-input);
   }
 
-  public void clawBlue(double orient) {
+  public void clawRed(double orient) {
     CUBO.setPosition(0);
-    mecanum.move(0.700, orient * -Math.PI / 2, 0);
+    mecanum.move(0.700, orient * Math.PI / 2, 0);
     sleep(280);
     mecanum.stop();
     BRZ.setPower(1);
@@ -578,17 +583,17 @@ public class IntellijBlue extends LinearOpMode {
     return;
   }
 
-  public void clawBlue2(double orient) {
+  public void clawRed2(double orient) {
     CUBO.setPosition(0);
     BRZ.setPower(1);
     sleep(750);
     BRZ.setPower(0);
-    mecanum.targetToPositionEncoders();
-    turnToPosition(3.8, 1);
-    sleep(100);
     mecanum.withoutEncoders();
+    turnperseconds(-.5);
+    sleep(80);
+    mecanum.stop();
     mecanum.move(0.8, 0, 0);
-    sleep(180);
+    sleep(400);
     mecanum.stop();
     CUBO.setPosition(1);
     sleep(700);
@@ -624,17 +629,6 @@ public class IntellijBlue extends LinearOpMode {
     SP_DRC.setPower(mecanum.calc1(speed, 0, 0));
     IN_DRC.setPower(mecanum.calc2(speed, 0, 0));
 
-    /*while (
-      SP_IZQ.isBusy() && SP_DRC.isBusy() && IN_IZQ.isBusy() && IN_DRC.isBusy()
-    ) {
-      if (exit) {
-        SP_DRC.setPower(0);
-        SP_IZQ.setPower(0);
-        IN_DRC.setPower(0);
-        IN_IZQ.setPower(0);
-        return;
-      }
-    }*/
     return;
   }
 
@@ -665,4 +659,16 @@ public class IntellijBlue extends LinearOpMode {
     }
     return;
   }
+    public void Diagonales(double speed, double speed1) {
+    SP_IZQ.setPower(speed);
+    IN_IZQ.setPower(speed1);
+    SP_DRC.setPower(speed1);
+    IN_DRC.setPower(speed);
+}
+    public void turnperseconds (double speed){
+    SP_IZQ.setPower(speed);
+    IN_IZQ.setPower(speed);
+    SP_DRC.setPower(-speed);
+    IN_DRC.setPower(-speed);
+    }
 }
