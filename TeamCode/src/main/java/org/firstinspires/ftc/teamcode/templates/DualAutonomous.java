@@ -74,6 +74,16 @@ public class DualAutonomous extends LinearOpMode implements Runnable{
     public int stage = 0;
     public int nextSkyStone = -1;
 
+    private boolean doStop = false;
+
+    public synchronized void doStop() {
+        this.doStop = true;
+    }
+
+    private synchronized boolean keepRunning() {
+        return this.doStop == false;
+    }
+
     @Override
     public void runOpMode() {
         SP_DRC = hardwareMap.dcMotor.get("SP_DRC");
@@ -391,10 +401,31 @@ public class DualAutonomous extends LinearOpMode implements Runnable{
     }
 
     public void runner(){
+        telemetry.addData("Controller", "Working");
+        telemetry.update();
+    }
 
+    public void thread(){
+        telemetry.addData("Thread", "Working");
+        telemetry.update();
     }
 
     @Override
     public void run() {
+        while(keepRunning()){
+            thread();
+        }
+    }
+
+    public void sleepThread(){
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void joinThread(){
+        doStop();
     }
 }
