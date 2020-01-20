@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.autonomous.ai;
+package org.firstinspires.ftc.teamcode.ai;
 
 import org.firstinspires.ftc.teamcode.templates.LinearAutonomous;
 
