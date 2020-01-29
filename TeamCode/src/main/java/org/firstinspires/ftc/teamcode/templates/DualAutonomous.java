@@ -5,12 +5,6 @@
  */
 package org.firstinspires.ftc.teamcode.templates;
 
-import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
-
-import org.firstinspires.ftc.teamcode.util.LibTMOA;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -20,10 +14,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.vuforia.CameraDevice;
-import java.util.ArrayList;
-import java.util.List;
-import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -31,7 +24,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.util.LibTMOA;
 import org.firstinspires.ftc.teamcode.util.Utilities;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 
 public class DualAutonomous extends LinearOpMode implements Runnable{
     public ElapsedTime runtime = new ElapsedTime();
@@ -73,6 +75,7 @@ public class DualAutonomous extends LinearOpMode implements Runnable{
     public float blueV;
     public int stage = 0;
     public int nextSkyStone = -1;
+    public boolean working = false;
 
     private boolean doStop = false;
 
@@ -218,7 +221,6 @@ public class DualAutonomous extends LinearOpMode implements Runnable{
         runtime.reset();
 
         waitForStart();
-
         runtime.startTime();
         while (opModeIsActive()){runner();}
     }
@@ -402,12 +404,16 @@ public class DualAutonomous extends LinearOpMode implements Runnable{
 
     public void runner(){
         telemetry.addData("Controller", "Working");
+        if(working) {
+            telemetry.addData("Thread", "Working");
+        }
         telemetry.update();
     }
 
     public void thread(){
-        telemetry.addData("Thread", "Working");
-        telemetry.update();
+        if(!working) {
+            working = true;
+        }
     }
 
     @Override

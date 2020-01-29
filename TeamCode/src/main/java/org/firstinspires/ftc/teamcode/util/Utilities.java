@@ -62,4 +62,32 @@ public class Utilities {
 
     public static final float HALF_FIELD = 72 * MM_PER_INCH;
     public static final float QUAD_FIELD = 36 * MM_PER_INCH;
+
+    public static final int OCV_ROWS = 640;
+    public static final int OCV_COLS = 480;
+
+    public static final float RECT_HEIGHT = 0.8f/8f;
+    public static final float RECT_WIDTH = 1.2f/8f;
+
+    public static final float OFFSET_X = 0f/8f;
+    public static final float OFFSET_Y = 0f/8f;
+
+    public static final float MID_OFFSET_X = 5f;
+    public static final float MID_OFFSET_Y = 4f;
+
+    public static final float LEFT_OFFSET_X = 2f;
+    public static final float LEFT_OFFSET_Y = 4f;
+
+    public static final float RIGHT_OFFSET_X = 8f;
+    public static final float RIGHT_OFFSET_Y = 4f;
+
+    public static final float OFFSET_X_DIV = 12f;
+    public static final float OFFSET_Y_DIV = 8f;
+
+    public static final float[] MID_POS = {MID_OFFSET_X/OFFSET_X_DIV+OFFSET_X, MID_OFFSET_Y/OFFSET_Y_DIV+OFFSET_Y};//0 = col, 1 = row
+    public static final float[] LEFT_POS = {LEFT_OFFSET_X/OFFSET_X_DIV+OFFSET_X, LEFT_OFFSET_Y/OFFSET_Y_DIV+OFFSET_Y};
+    public static final float[] RIGHT_POS = {RIGHT_OFFSET_X/OFFSET_X_DIV+OFFSET_X, RIGHT_OFFSET_Y/OFFSET_Y_DIV+OFFSET_Y};
+
+
+
 }
